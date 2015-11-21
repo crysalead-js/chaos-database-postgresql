@@ -273,12 +273,7 @@ class PostgreSql extends Database {
             }
             break;
           case 'boolean':
-            if (dflt === 'true') {
-              dflt = true;
-            }
-            if (dflt === 'false') {
-              dflt = false;
-            }
+            dflt = dflt === 'true';
             break;
           case 'integer':
             dflt = Number(Number.parseFloat(dflt)) === dflt ? dflt : null;
