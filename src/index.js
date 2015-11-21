@@ -66,6 +66,13 @@ class PostgreSql extends Database {
     this._client = config.client;
 
     /**
+     * Whether the client is connected or not.
+     *
+     * @var Boolean
+     */
+    this._connected = false;
+
+    /**
      * The SQL dialect instance.
      *
      * @var Function
@@ -111,18 +118,21 @@ class PostgreSql extends Database {
       return Promise.reject(new Error('Error, no database name has been configured.'));
     }
 
+    var self = this;
+
     return new Promise(function(accept, reject) {
       var connectionString = config.username + (config.password ? ':' + config.password : '');
       connectionString += '@' + config.host + ':' + String(config.port) + '/' + config.database;
       var client = new pg.Client("postgres://" + connectionString);
-      this._client = client;
+      self._client = client;
       client.connect(function(err) {
         if (err) {
           reject(new Error('Unable to connect to host , error ' + err.code + ' ' + err.stack));
         }
+        self._connected = true;
         accept(client)
       });
-    }.bind(this));
+    });
   }
 
   /**
@@ -133,7 +143,7 @@ class PostgreSql extends Database {
    *                 otherwise been dropped by the remote resource during the course of the request.
    */
   connected() {
-    return !!this._client;
+    return this._connected;
   }
 
   /**
@@ -325,6 +335,7 @@ class PostgreSql extends Database {
     }
     this._client.end();
     this._client = undefined;
+    this._connected = false;
     return true;
   }
 }
