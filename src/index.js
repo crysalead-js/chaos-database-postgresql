@@ -127,7 +127,7 @@ class PostgreSql extends Database {
       self._client = client;
       client.connect(function(err) {
         if (err) {
-          reject(new Error('Unable to connect to host , error ' + err.code + ' ' + err.stack));
+          return reject(new Error('Unable to connect to host , error ' + err.code + ' ' + err.stack));
         }
         self._connected = true;
         accept(client)
@@ -166,12 +166,12 @@ class PostgreSql extends Database {
       self.connect().then(function() {
         self._client.query(sql, function(err, data) {
           if (err) {
-            reject(err);
+            return reject(err);
           }
           if (sql.match(/^INSERT/i)) {
             self._client.query('SELECT lastval()', function(err, data) {
               if (err) {
-                reject(err);
+                return reject(err);
               }
               self._lastInsertId = data.rows[0] ? data.rows[0].lastval : undefined;
               accept(new cursor());
