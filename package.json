@@ -1,6 +1,6 @@
 {
   "name": "chaos-database-postgresql",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "description": "PostgreSQL adapter for Chaos ORM.",
   "license": "MIT",
   "repository": {
@@ -23,11 +23,11 @@
   "main": "lib/index.js",
   "jsnext:main": "src/index.js",
   "dependencies": {
-    "chaos-database": "^0.1.2",
+    "chaos-database": "^1.0",
     "co": "^4.6.0",
     "extend-merge": "^1.0.3",
     "pg": "^4.4.3",
-    "sql-dialect": "^1.0.3"
+    "sql-dialect": "^1.0"
   },
   "devDependencies": {
     "babel-cli": "^6.2.0",
