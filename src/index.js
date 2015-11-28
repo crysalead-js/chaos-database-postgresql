@@ -19,7 +19,8 @@ class PostgreSql extends Database {
     var features = {
       arrays: true,
       transactions: true,
-      booleans: true
+      booleans: true,
+      default: true
     };
     if (!arguments.length) {
       return extend({}, features);
