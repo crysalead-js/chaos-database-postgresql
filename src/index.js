@@ -175,10 +175,12 @@ class PostgreSql extends Database {
                 return reject(err);
               }
               self._lastInsertId = data.rows[0] ? data.rows[0].lastval : undefined;
-              accept(new cursor());
+              accept(true);
             });
+          } else if (sql.match(/^(UPDATE|DELETE)/i)) {
+            accept(true);
           } else {
-            accept(new cursor({ data: data && data.rows ? data.rows : [] }));
+            accept(data && data.rows ? new cursor({ data: data.rows }) : true);
           }
         });
       })
