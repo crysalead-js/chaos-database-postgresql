@@ -80,17 +80,19 @@ class PostgreSql extends Database {
      */
     var dialect = this.classes().dialect;
 
-    if (typeof this._dialect !== 'object') {
-      this._dialect = new dialect({
-        caster: function(value, states) {
-          var type = states && states.type ? states.type : this.constructor.getType(value);
-          if (typeof type === 'function') {
-            type = type(states.name);
-          }
-          return this.format('datasource', type, value);
-        }.bind(this)
-      });
+    if (typeof this._dialect === 'object') {
+      return;
     }
+
+    this._dialect = new dialect({
+      caster: function(value, states) {
+        var type = states && states.type ? states.type : this.constructor.getType(value);
+        if (typeof type === 'function') {
+          type = type(states.name);
+        }
+        return this.format('datasource', type, value);
+      }.bind(this)
+    });
   }
 
   /**

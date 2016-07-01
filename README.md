@@ -11,6 +11,9 @@ PostgreSQL adapter for [Chaos ORM](https://github.com/crysalead-js/chaos-orm).
 npm install chaos-database-postgresql
 ```
 
+__Note: Require `babel-polyfill` as a peer dependency__
+
+
 ## Testing
 
 ```
