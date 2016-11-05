@@ -1,8 +1,9 @@
-import co from 'co';
-import pg from 'pg';
-import { extend, merge } from 'extend-merge';
-import { Database } from 'chaos-database';
-import { PostgreSql as PostgreSqlDialect } from 'sql-dialect';
+var co = require('co');
+var pg = require('pg');
+var extend = require('extend-merge').extend;
+var merge = require('extend-merge').merge;
+var Database = require('chaos-database').Database;
+var PostgreSqlDialect = require('sql-dialect').PostgreSql;
 
 /**
  * PostgreSQL adapter
@@ -314,4 +315,4 @@ class PostgreSql extends Database {
   }
 }
 
-export default PostgreSql;
+module.exports = PostgreSql;
