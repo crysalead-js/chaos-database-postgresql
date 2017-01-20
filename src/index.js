@@ -87,10 +87,11 @@ class PostgreSql extends Database {
 
     this._dialect = new dialect({
       caster: function(value, states) {
-        var type = states && states.type ? states.type : this.constructor.getType(value);
-        if (typeof type === 'function') {
-          type = type(states.name);
+        var type;
+        if (states && states.schema) {
+          type = states.schema.type(states.name);
         }
+        type = type ? type : this.constructor.getType(value);
         return this.convert('datasource', type, value);
       }.bind(this)
     });
