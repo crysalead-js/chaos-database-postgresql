@@ -55,11 +55,13 @@ describe("PostgreSql", function() {
       expect(PostgreSql.enabled()).toEqual({
         arrays: true,
         transactions: true,
+        savepoints: true,
         booleans: true,
         default: true
       });
       expect(PostgreSql.enabled('arrays')).toBe(true);
       expect(PostgreSql.enabled('transactions')).toBe(true);
+      expect(PostgreSql.enabled('savepoints')).toBe(true);
       expect(PostgreSql.enabled('booleans')).toBe(true);
       expect(PostgreSql.enabled('default')).toBe(true);
 
@@ -207,6 +209,37 @@ describe("PostgreSql", function() {
         done();
       });
 
+    });
+
+  });
+
+  describe(".execute()", function() {
+
+    it("executes raw queries", function(done) {
+
+      co(function*() {
+        var schema = new Schema({ connection: this.connection });
+        schema.source('gallery');
+        schema.column('id', { type: 'serial' });
+        schema.column('name', { type: 'string' });
+        yield schema.create();
+
+        yield this.connection.openTransaction();
+
+        yield schema.insert({ name: 'new gallery' });
+        var id = schema.lastInsertId();
+        var cursor = yield this.connection.query('SELECT "name" FROM "gallery" WHERE "id" = ' + id);
+        var gallery = cursor.next();
+        expect(gallery.name).toBe('new gallery');
+
+        yield this.connection.execute("ROLLBACK");
+
+        cursor = yield this.connection.query('SELECT "name" FROM "gallery" WHERE "id" = ' + id);
+        expect(cursor.next()).toBe(undefined);
+
+        yield schema.drop();
+        done();
+      }.bind(this));
     });
 
   });
@@ -494,14 +527,8 @@ describe("PostgreSql", function() {
       expect(this.connection.convert('cast', 'date', '2014-11-21')).toEqual(date);
       var datetime = new Date('2014-11-21 10:20:45');
       expect(this.connection.convert('cast', 'datetime', datetime)).toEqual(datetime);
-
-      var offset = new Date('2014-11-21 10:20:45').getTimezoneOffset();
-      var timezone = ('0' + Math.floor(Math.abs(offset)/60)).slice(-2) + ':' + ('0' + offset%60).slice(-2);
-      timezone = offset > 0 ? '-' + timezone : '+' + timezone;
-      var local = new Date('2014-11-21T10:20:45' + timezone);
-      expect(this.connection.convert('cast', 'datetime', '2014-11-21 10:20:45')).toEqual(local);
-
-      expect(this.connection.convert('cast', 'datetime', 1416565245 * 1000)).toEqual(new Date('2014-11-21T10:20:45.000Z'));
+      expect(this.connection.convert('cast', 'datetime', '2014-11-21 10:20:45')).toEqual(new Date('2014-11-21T10:20:45.000Z'));
+      expect(this.connection.convert('cast', 'datetime', 1416565245)).toEqual(new Date('2014-11-21T10:20:45.000Z'));
       expect(this.connection.convert('cast', 'boolean', 1)).toBe(true);
       expect(this.connection.convert('cast', 'boolean', 0)).toBe(false);
       expect(this.connection.convert('cast', 'null', 'NULL')).toBe(null);

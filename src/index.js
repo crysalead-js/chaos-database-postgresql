@@ -20,6 +20,7 @@ class PostgreSql extends Database {
     var features = {
       arrays: true,
       transactions: true,
+      savepoints: true,
       booleans: true,
       default: true
     };
@@ -141,6 +142,15 @@ class PostgreSql extends Database {
   }
 
   /**
+   * Opens a transaction
+   *
+   * @return Promise
+   */
+  openTransaction() {
+    return this.execute('START TRANSACTION');
+  }
+
+  /**
    * Checks the connection status of this data source.
    *
    * @return Boolean Returns a boolean indicating whether or not the connection is currently active.
@@ -171,12 +181,14 @@ class PostgreSql extends Database {
       self.connect().then(function() {
         self._client.query(sql, function(err, data) {
           if (err) {
-            return reject(err);
+            reject(err);
+            return;
           }
           if (sql.match(/^INSERT/i)) {
             self._client.query('SELECT lastval()', function(err, data) {
               if (err) {
-                return reject(err);
+                reject(err);
+                return;
               }
               self._lastInsertId = data.rows[0] ? data.rows[0].lastval : undefined;
               accept(true);
@@ -188,6 +200,27 @@ class PostgreSql extends Database {
           }
         });
       })
+    });
+  }
+
+  /**
+   * Execute a raw query.
+   *
+   * @param  string  sql SQL query to execute.
+   * @return Promise
+   */
+  execute(sql) {
+    var self = this;
+    return new Promise(function(accept, reject) {
+      self.connect().then(function() {
+        self._client.query(sql, function(err, data) {
+          if (err) {
+            reject(err);
+            return;
+          }
+          accept();
+        });
+      });
     });
   }
 
