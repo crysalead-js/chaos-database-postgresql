@@ -1,7 +1,10 @@
 sudo: false
 language: node_js
 node_js:
-  - "10"
+  - "12"
+
+services:
+  - postgresql
 
 before_script:
   - psql -c 'create database chaos_test;' -U postgres
