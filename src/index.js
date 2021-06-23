@@ -292,8 +292,9 @@ class PostgreSql extends Database {
           case 'integer':
             dflt = Number(Number.parseFloat(dflt)) === dflt ? dflt : null;
             break;
+          case 'date':
           case 'datetime':
-            dflt = dflt !== 'now()' ? dflt : null;
+            dflt = null;
             break;
         }
 
